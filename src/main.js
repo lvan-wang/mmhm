@@ -13,6 +13,7 @@ import * as filters from './filters' // global filters
 import './mock' // simulation data
 // font-awesome
 import 'font-awesome/css/font-awesome.css'
+import '../src/styles/global.css'
 /*
  * 注册 - 业务模块
  */
