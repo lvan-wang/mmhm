@@ -1,14 +1,4 @@
 <template>
-<<<<<<< HEAD
-  <div class='container'>试题预览对话框</div>
-</template>
-
-<script>
-export default {}
-</script>
-
-<style scoped lang='less'></style>
-=======
   <div>
     <!-- 题头 -->
     <div class="header_concent">
@@ -109,4 +99,3 @@ export default {
   padding: 15px 0;
 }
 </style>
->>>>>>> 2e123108ddc771cea7996c882151a66a728b4148
