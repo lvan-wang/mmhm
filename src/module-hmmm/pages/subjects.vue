@@ -10,7 +10,7 @@
       </div>
     <div role="alert" class="el-alert alert el-alert--info is-light" style="margin-bottom: 15px;">
       <i class="el-alert__icon el-icon-info"></i>
-      <span class="el-alert__title">数据一共{{msg}}条</span>
+      <span class="el-alert__title">数据一共{{total}}条</span>
       </div>
         <template>
           <!-- 表格 -->
@@ -62,35 +62,10 @@
       </el-table-column>
     </el-table>
     <!-- 分页 -->
-    <div class="el-pagination is-background" style="margin-top: 20px; text-align: right;" 
-    >
-      <button type="button" disabled="disabled" class="btn-prev">
-        <i class="el-icon el-icon-arrow-left"></i>
-      </button>
-      <ul class="el-pager">
-        <li class="number active">1</li>
-      </ul>
-      <button type="button" disabled="disabled" class="btn-prev">
-        <i class="el-icon el-icon-arrow-right"></i>
-      </button>
-      <span class="el-pagination__sizes">
-        <div class="el-select el-select--mini">
-          <div class="el-input el-input--mini el-input--suffix">
-            <input type="text" readonly="readonly" autocomplete="off" placeholder="请选择" class="el-input__inner">
-            <span class="el-input__suffix">
-              <span class="el-input__suffix-inner">
-                <i class="el-select__caret el-input__icon el-icon-arrow-up"></i>
-              </span>
-            </span>
-          </div>
-        </div>
-      </span>
-      <span class="el-pagination__jump">前往
-        <div class="el-input el-input--medium el-pagination__editor is-in-pagination">
-          <input type="number" autocomplete="off" min="1" max="2" class="el-input__inner">
-        </div>页
-      </span>
-    </div>
+    <div class="fenyeyouyi">
+     <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="queryInfo.page" :page-sizes="[5, 10, 20, 50]" :page-size="queryInfo.pagesize" layout="prev, pager, next, total, sizes, jumper" :total="total">
+      </el-pagination>
+      </div>
   </template>
     </el-card>
   </div>
@@ -101,32 +76,38 @@ import { list } from '@/api/hmmm/subjects'
 export default {
   data (){
     return {
-      msg: '',
-      dataList: []
+      // 获取学科列表的参数对象
+      queryInfo: {
+        query: '',
+        page: 1,
+        pagesize: 10,
+      },
+      //数据条数
+      total: null,
+      //列表
+      dataList: [],
     }
   },
   created (){
-    this.getSubject ()
+    this.getSubjectList ()
   },
   methods:{
+    //获取列表
+    async getSubjectList () {
+      const { data } = await list ({page:this.queryInfo.page,pagesize:this.queryInfo.pagesize}) 
+      console.log(data)
+      this.dataList = data.items
+      this.total = data.counts
+    },
     //分页
     handleSizeChange (newSize) {
       this.queryInfo.pagesize = newSize
-      this.getDirectorysList()
+      this.getSubjectList()
     },
-    handleCurrentChange(newSize) {
-      this.queryInfo.pagesize = newSize
-      this.getDirectorysList()
+    handleCurrentChange(newPage) {
+      this.queryInfo.page = newPage
+      this.getSubjectList()
     },
-    //获取列表
-    async getSubject () {
-      const { data } = await list () 
-      console.log(data)
-      this.dataList = data.items
-      console.log(this.dataList)
-      this.msg = data.counts
-      console.log(this.msg)
-    }
   }
 }
 </script>
@@ -165,5 +146,13 @@ export default {
 .caozuo_a{
   color: blue;
   margin-right: 15px;
+}
+.fenyeyouyi {
+  margin-top: 20px;
+  height: 28px;
+}
+.el-pagination {
+  position: absolute;
+  right: 42px;
 }
 </style>
