@@ -22,7 +22,7 @@ export function parseTime (time, cFormat) {
   }
 
   if ((time + '').length === 10) {
-    time = +time * 1000
+    time = +time *1000
   }
 
   const format = cFormat || '{y}-{m}-{d} {h}:{i}:{s}'
