@@ -113,7 +113,7 @@ export default {
           // console.log(res.data)
           this.dataList = res.data.items
           this.pagination.total = res.data.total
-          this.alertText = `共 ${this.pagination.total} 条记录`
+          this.alertText = `共 ${this.npaginatio.total} 条记录`
           this.loading = false
         })
         .catch(e => {
