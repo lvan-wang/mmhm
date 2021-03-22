@@ -11,9 +11,10 @@ import './icons' // icon
 import './errorLog' // error log
 import * as filters from './filters' // global filters
 import './mock' // simulation data
-import './styles/global.css'
 // font-awesome
 import 'font-awesome/css/font-awesome.css'
+// 导入全局样式表
+import './styles/global.css'
 /*
  * 注册 - 业务模块
  */
