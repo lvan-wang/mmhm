@@ -173,7 +173,7 @@ export default {
       this.directorysList = data.items;
       this.total = data.counts;
     },
-    // 点击清除按钮
+    // 点击清除
     onDeleate() {
       console.log("onDeleate");
       this.queryInfo.directoryName = ''
