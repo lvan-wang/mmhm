@@ -1,13 +1,14 @@
 <template>
 <!-- 头部 -->
+<!-- 头部 -->
   <div class='container'><el-card>
       <div class="guanjianziwaikuang">
         <span class="guanjianzi">关键字</span>
-    <input type="text" autocomplete="off" class="el-input_inner" placeholder="根据编号搜索">
-    <div class="nuodaoyoubian">
-      <button type="button" class="el-button el-button--default el-button--small"><span>清除</span></button>
-    <button type="button" class="el-button el-button--primary el-button--small"><span>搜索</span></button>
-    </div>
+        <el-input @clear="getQuestionsList" v-model="queryInfo.keyword" size="small" style="height: 20px; width:200px"  placeholder="根据编号搜索"></el-input>
+        <div class="nuodaoyoubian">
+          <el-button size="small" class="colInput" plain @click="clear">清除</el-button>
+          <el-button slot="append"  size="small" class="colInput" type="primary" @click="getQuestionsList">搜索</el-button>
+        </div>
       </div>
     <div role="alert" class="el-alert alert el-alert--info is-light" style="margin-bottom: 15px;">
       <i class="el-alert__icon el-icon-info"></i>
@@ -52,9 +53,11 @@
       </el-table-column>
       <el-table-column
         label="操作">
-      <button type="button" class=" shanchulajitong el-button el-button--danger el-button--small is-plain is-circle" title="删除" style="margin:0">
+        <template slot-scope="scope">
+      <button @click="delQuestions(scope.row)" type="button" class=" shanchulajitong el-button el-button--danger el-button--small is-plain is-circle" title="删除" style="margin:0">
         <i class="el-icon-delete"></i>
       </button>
+        </template>
       </el-table-column>
     </el-table>
     <!-- 分页 -->
@@ -69,12 +72,13 @@
 
 <script>
 import { randoms } from '@/api/hmmm/questions'
+import { removeRandoms } from '@/api/hmmm/questions'
 export default {
   data (){
     return {
       // 获取学科列表的参数对象
       queryInfo: {
-        query: '',
+        keyword: '',
         page: 1,
         pagesize: 20,
       },
@@ -88,8 +92,9 @@ export default {
     this.getQuestionsList()
   },
   methods:{
+    //获取列表-搜索列表
     async getQuestionsList () {
-      const { data } = await randoms ({page:this.queryInfo.page,pagesize:this.queryInfo.pagesize}) 
+      const { data } = await randoms ({keyword:this.queryInfo.keyword,page:this.queryInfo.page,pagesize:this.queryInfo.pagesize}) 
       console.log(data)
       this.dataList = data.items
       this.total = data.counts
@@ -102,6 +107,23 @@ export default {
     handleCurrentChange(newPage) {
       this.queryInfo.page = newPage
       this.getQuestionsList ()
+    },
+    //清除
+    clear () {
+      this.queryInfo = {
+        subjectName: '',
+      }
+    },
+    //删除组题
+    async delQuestions (id) {
+    await this.$confirm('此操作将永久删除该学科, 是否继续?', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+    await removeRandoms(id)
+    this.$message.success('删除成功')
+    this.getQuestionsList()
     },
   }
 }
