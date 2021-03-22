@@ -141,8 +141,8 @@ export default {
 }
 .nuodaoyoubian {
   position: absolute;
-  right: 42px;
-  top: 42px;
+  right: 22px;
+  top: 22px;
 }
 .el-input_inner {
   border-radius: 4px;
