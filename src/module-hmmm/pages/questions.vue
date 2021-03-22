@@ -13,7 +13,7 @@
             <!-- 第一个 -->
             <div class="header_col">
             <el-form-item label="学科">
-              <el-select v-model="form.subject" placeholder="请选择" style="width: 100%">
+              <el-select @change="selectCatalogue" v-model="form.subjectID" placeholder="请选择" style="width: 100%">
                 <el-option v-for="item, index in subjectList" :key="index" :value="item.value" :label="item.label"></el-option>
               </el-select>
             </el-form-item>
@@ -208,7 +208,8 @@
 <script>
 import cityData from '../citydata'
 import { list, remove, choiceAdd } from '../../api/hmmm/questions'
-import { simple } from '../../api/hmmm/subjects'
+import { simple, detail } from '../../api/hmmm/subjects'
+
 import { createAPI } from '@/utils/request'
 import QuestionsPreview from '../components/questions-preview'
 export default {
@@ -222,11 +223,11 @@ export default {
       total: 0, // 总数据条数
       subjectList: [], // 学科数据
       setRecords: [], // 录入人数据
-      // from 表单提交的所有数据
+      // form 表单提交的所有数据
       form: {
         page: 1,
         pagesize: 8,
-        subject: '', // 学科
+        subjectID: '', // 学科
         keyword: '', // 关键字
         questionType: '', // 试题类型
         difficulty: '', // 难度
@@ -235,7 +236,8 @@ export default {
         remarks: '', // 题目备注
         shortName: '', // 企业简称
         tags: '', // 标签
-        city: '' //城市
+        city: '', //城市
+        catalogID: '' // 目录
       },
       // 省市的联动
       cityData: cityData,
@@ -290,6 +292,7 @@ export default {
     this.getsubject()
     // 获取录入人
     this.setRecordsList()
+
   },
   methods: {
     // 获取数据列表
@@ -395,7 +398,7 @@ export default {
           page: 1,
           pagesize: 10
         })
-        console.log(data)
+        // console.log(data)
         this.setRecords = data.list
       } catch (err) {
         this.$message.error('获取数据失败')
@@ -403,7 +406,7 @@ export default {
     },
     // 清除按钮的点击事件
     emptyForm () {
-      this.form.subject = '', // 学科
+      this.form.subjectID = '', // 学科
       this.form.keyword = '', // 关键字
       this.form.questionType = '', // 试题类型
       this.form.difficulty = '', // 难度
@@ -419,12 +422,26 @@ export default {
       try {
         const { data } = await list(this.form)
         console.log(data)
+        this.list = data.items
+        this.total = data.counts
       } catch (err) {
         this.$message.error('获取数据失败')
+      }
+    },
+    async selectCatalogue () {
+      try {
+        console.log(this.form.subjectID)
+        const id = {id: this.form.subjectID}
+        const { data } = await detail(id)
+        console.log(data)
+      } catch (err) {
+        this.$message.error('获取二级目录失败')
       }
     }
   },
   computed: {
+  },
+  watch: {
   }
 }
 </script>
