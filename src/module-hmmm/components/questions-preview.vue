@@ -24,11 +24,13 @@
       </div>
       <div class="header_text">
         <span>【学科】：</span>
+        <span>{{row.subjectName}}</span>
         <span>{{row.subject}}</span>
       </div>
       <div class="header_text">
         <span>【目录】：</span>
         <span>{{row.catalog}}</span>
+        <span>{{row.directoryName}}</span>
       </div>
       <div class="header_text">
         <span>【方向】：</span>
@@ -77,14 +79,14 @@
       </div>
     </div>
     <!-- 答案解析 -->
-    <div class="common">
-      <span>【答案解析】：</span>
-      <span>无</span>
+    <div class="common daanjiexibox">
+      <span >【答案解析】：</span>
+      <span class="daanjiexi" v-html="row.answer">{{row.answer}}</span>
     </div>
     <!-- 题目备注 -->
     <div class="remark">
       <span>【题目备注】：</span>
-      <span>无</span>
+      <span>{{row.remarks}}</span>
     </div>
   </div>
 </template>
@@ -185,5 +187,12 @@ export default {
 }
 .questionType_checkbox {
   padding: 5px 0;
+}
+.daanjiexibox {
+  position: relative;
+}
+.daanjiexi {
+  position: absolute;
+  bottom: 0px;
 }
 </style>

@@ -179,10 +179,14 @@ export default {
   methods:{
     //获取列表-搜索列表
     async getSubjectsList () {
+      try {
       const { data } = await list ({subjectName:this.queryInfo.subjectName,page:this.queryInfo.page,pagesize:this.queryInfo.pagesize}) 
       console.log(data)
       this.dataList = data.items
       this.total = data.counts
+       } catch (err) {
+         this.$message.error('获取数据失败')
+       }
     },
     //清除
     clear () {
