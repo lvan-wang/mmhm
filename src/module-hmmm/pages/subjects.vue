@@ -275,7 +275,7 @@ export default {
     }
 </script>
 
-<style rel="stylesheet/scss" lang="scss">
+<style scoped rel="stylesheet/scss" lang="scss">
 .xuekemingchengwaikuang {
   margin-bottom: 20px;
 }

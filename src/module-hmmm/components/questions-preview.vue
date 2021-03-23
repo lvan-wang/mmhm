@@ -109,7 +109,7 @@ export default {
     }
   },
   created () {
-    console.log(this.row)
+    // console.log(this.row)
     this.getAnswer()
   },
   methods: {

@@ -1,5 +1,6 @@
 <template>
 <!-- 头部 -->
+
   <div class='container'><el-card>
       <div class="guanjianziwaikuang">
         <span class="guanjianzi">关键字</span>
@@ -27,6 +28,11 @@
         prop="questionType"
         label="题型"
         width="180">
+        <template slot-scope="scope">
+          <p v-if="scope.row.questionType === '1'">单选</p>
+          <p v-else-if="scope.row.questionType === '2'">多选</p>
+          <p v-else>简答</p>
+        </template>
       </el-table-column>
       <el-table-column
         label="题目编号">
@@ -152,7 +158,7 @@ export default {
     //获取列表-搜索列表
     async getQuestionsList () {
       const { data } = await randoms ({keyword:this.queryInfo.keyword,page:this.queryInfo.page,pagesize:this.queryInfo.pagesize}) 
-      // console.log(data)
+      console.log(data)
       this.dataList = data.items
       this.total = data.counts
     },
@@ -185,14 +191,16 @@ export default {
     // 预览功能的按钮
     async previewBtn (id) {
       const { data } = await detail({ id })
+      console.log(id);
       this.previewVisible = true
       this.row = data
+      console.log(data);
     },
   }
 }
 </script>
 
-<style rel="stylesheet/scss" lang="scss">
+<style scoped rel="stylesheet/scss" lang="scss">
 .guanjianziwaikuang {
   margin-bottom: 20px;
 }
