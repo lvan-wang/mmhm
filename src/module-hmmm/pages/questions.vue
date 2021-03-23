@@ -1,15 +1,15 @@
 <template>
-  <div class='container'>题组管理
+  <div class='container'>
     <el-card>
       <!-- 头部导语和按钮 -->
       <div class="card_header">
         <span class="header_text">说明：目前支持学科和关键字条件筛选</span>
-        <el-button type="success" icon="el-icon-edit" size="small" @click="$router.push('/questions/new/' + 0)">新增试题</el-button>
+        <el-button type="success" icon="el-icon-edit" size="small" @click="$router.push('/questions/new/0')">新增试题</el-button>
       </div>
       <!-- 头部选择区域 -->
       <div class="header_select">
 
-          <el-form ref="form" :model="form" label-width="80px">
+          <el-form ref="form" :model="form" label-width="80px" inline>
             <!-- 第一个 -->
             <div class="header_col">
             <el-form-item label="学科">
@@ -107,12 +107,29 @@
             </el-form-item>
         </div>
         <!-- 十一 -->
-        <!-- <div class="header_col">
-          <el-form ref="form" :model="form" label-width="80px"> -->
             <div class="header_col">
-            <el-form-item label="城市">
+            <!-- <el-form-item label="城市">
               <el-cascader v-model="form.city" :options="cityData" style="width:100%"></el-cascader>
-            </el-form-item>
+            </el-form-item> -->
+
+              <el-form-item label="城市：">
+                <el-select @change="selectProvinces" v-model="form.province" placeholder="请选择" style="width:110px;">
+                  <el-option
+                  v-for="item, index in provinces"
+                  :key="index"
+                  :label="item"
+                  :value="item">
+                </el-option>
+                </el-select>
+                <el-select v-model="form.city" placeholder="请选择"  style="width:110px;">
+                <el-option
+                  v-for="item, index in citys"
+                  :key="index"
+                  :label="item"
+                  :value="item">
+                </el-option>
+              </el-select>
+              </el-form-item>
             </div>
         </el-form>
         
@@ -206,12 +223,13 @@
 </template>
 
 <script>
-import cityData from '../citydata'
+// import cityData from '../citydata'
 import { list, remove, choiceAdd } from '../../api/hmmm/questions'
 import { simple, detail } from '../../api/hmmm/subjects'
 
 import { createAPI } from '@/utils/request'
 import QuestionsPreview from '../components/questions-preview'
+import {citys, provinces} from '../../api/hmmm/citys'
 export default {
   name: 'BasicQuestions',
   components: {
@@ -238,12 +256,15 @@ export default {
         remarks: '', // 题目备注
         shortName: '', // 企业简称
         tags: [], // 标签
-        city: '', //城市
+        province: '', // 市
+        city: '', //区
         catalogID: '' // 目录
       },
+      provinces: provinces(), // 市
+      citys: [], // 县
       // 省市的联动
-      cityData: cityData,
-      currentPage4: 4,
+      // cityData: cityData,
+      // currentPage4: 4,
       // 分页区域的参数
       queryInfo: {
         pagenum: 1,
@@ -381,7 +402,6 @@ export default {
         this.$message.error('加入精选失败')
       }
       
-
     },
     // 获取学科列表
     async getsubject () {
@@ -417,7 +437,8 @@ export default {
       this.form.remarks = '', // 题目备注
       this.form.shortName = '', // 企业简称
       this.form.tags = '' // 标签
-      this.form.city = '' // 城市
+      this.form.province = '' // 城市
+      this.form.city = '' // 城区
     },
     // 搜索按钮
     async search () {
@@ -447,8 +468,14 @@ export default {
 
       } catch (err) {
       }
+    },
+    // 选择城市下拉框的change事件
+    selectProvinces (provinces) {
+      // console.log(provinces)
+      this.citys = []
+      const res =  citys(provinces)
+      this.citys = res
     }
-    
   },
   computed: {
   },
