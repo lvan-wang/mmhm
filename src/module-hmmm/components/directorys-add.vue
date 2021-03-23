@@ -92,7 +92,7 @@ export default {
       // 全部触发效验
       this.$refs.dirForm.validate(async (valid) => {
         if (valid) {
-          // 如果是从学科点击跳转过来的，就把获取的学科 id，赋值给学科字段
+          // 获取的学科 id，赋值给学科字段
           if (this.$route.query.id) {
             // 注意这里需要把 id转为整数
             this.reqParams.subjectID = +this.$route.query.id
@@ -113,7 +113,7 @@ export default {
             }
           }
           this.dialogVisible = false
-          // 无论是添加成功还是编辑成功，都通知父组件重新渲染裂变
+          // 无论是添加成功还是编辑成功，都通知父组件重新渲染
           this.$emit('addSuccess')
         }
       })
@@ -122,8 +122,8 @@ export default {
 }
 </script>
 
-<style scoped lang='scss'>
-::v-deep .el-dialog__footer {
+<style lang='scss'>
+.el-dialog__footer {
   text-align: right;
 }
 </style>

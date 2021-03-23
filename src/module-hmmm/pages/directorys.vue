@@ -25,7 +25,6 @@
           </el-form>
         </el-col>
         <el-col :span="6" style="text-align: right;">
-          <el-button @click="returnSubject" type="text" icon="el-icon-back" v-if="$route.query.id">返回学科</el-button>
           <el-button @click="addDirectory" type="success" icon="el-icon-edit" size="small">新增目录</el-button>
         </el-col>
       </el-row>
@@ -142,10 +141,6 @@ export default {
     removeform () {
       this.$refs.directoryForm.resetFields()
       this.obtainList()
-    },
-    // 返回学科
-    returnSubject () {
-      this.$router.push({ path: '/list', name: 'subjects-list' })
     },
     // 新增目录，调用子组件方法
     addDirectory () {
