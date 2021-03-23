@@ -1,208 +1,214 @@
-<template class = "tag-container">
-  <div class="container">
-    <!-- 卡片区域 -->
-    <el-card class="cardTop">
-      <!-- 搜索 -->
-      <el-form
-        :inline="true"
-        :model="queryInfo"
-        class="demo-form-inline"
-      >
-        <el-form-item label="标签名称">
-          <el-input
-            v-model="queryInfo.directoryName"
-            @keyup.enter="onSubmit"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="状态">
-          <el-select v-model="queryInfo.state" placeholder="请选择">
-            <el-option
-              v-for="item in directorysTypeList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            >
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-button @click="onDeleate">清除</el-button>
-          <el-button type="primary" @click="onSubmit">搜索</el-button>
-        </el-form-item>
-        <el-button type="success" class="successButton el-icon-edit"
-          >新增目录</el-button
-        >
-      </el-form>
-      <!-- 消息提示框 -->
-      <el-alert :title="'数据一共' + total + '条'" type="info" show-icon>
+<template>
+  <div class='container'>
+    <el-card class="box-card" style="margin: 10px">
+      <!-- 如果是从学科管理跳转过来的，就需要面包屑了 -->
+      <div slot="header" class="clearfix" v-if="$route.query.id">
+        <el-breadcrumb separator-class="el-icon-arrow-right">
+          <el-breadcrumb-item>学科管理</el-breadcrumb-item>
+          <el-breadcrumb-item>{{ $route.query.name }}</el-breadcrumb-item>
+          <el-breadcrumb-item>目录管理</el-breadcrumb-item>
+        </el-breadcrumb>
+      </div>
+      <!-- 布局 -->
+      <el-row>
+        <el-col :span="18">
+          <!-- 表单 -->
+          <el-form :inline="true" ref="directoryForm" :model="reqParams" class="demo-form-inline" size="small" label-width="80px">
+            <el-form-item label="目录名称" prop="directoryName">
+              <el-input v-model="reqParams.directoryName" placeholder="请输入目录名称"></el-input>
+            </el-form-item>
+            <el-form-item label="状态" prop="state">
+              <el-select v-model="reqParams.state" placeholder="请选择">
+                <el-option
+                  v-for="item in statusList"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item>
+              <el-button @click="removeform">清除</el-button>
+              <el-button type="primary" @click="obtainList">查询</el-button>
+            </el-form-item>
+          </el-form>
+        </el-col>
+        <el-col :span="6" style="text-align: right;">
+          <el-button @click="returnSubject" type="text" icon="el-icon-back" v-if="$route.query.id">返回学科</el-button>
+          <el-button @click="addDirectory" type="success" icon="el-icon-edit" size="small">新增目录</el-button>
+        </el-col>
+      </el-row>
+      <!-- 提示总数量 -->
+       <el-alert
+        style="margin-bottom: 20px"
+        :title="`数据一共 ${total} 条`"
+        type="info"
+        show-icon
+        :closable="false">
       </el-alert>
-      <!-- 标签正文 -->
-      <el-table :data="directorysList" style="width: 100%" class="label">
-        <el-table-column
-          type="index"
-          prop="id"
-          label="序号"
-          width="80"
-        ></el-table-column>
-        <el-table-column
-          prop="subjectName"
-          label="所属学科"
-          width="180"
-        ></el-table-column>
-        <el-table-column
-          prop="directoryName"
-          label="目录名称"
-        ></el-table-column>
-        <el-table-column prop="username" label="创建者"></el-table-column>
-        <el-table-column prop="addDate" label="创建日期"></el-table-column>
-        <el-table-column prop="totals" label="面试题数量"></el-table-column>
-        <el-table-column prop="state" label="状态">
+      <!-- 表格 -->
+      <el-table
+        :data="tableData"
+        style="width: 100%">
+        <el-table-column label="序号" width="80px" type="index"></el-table-column>
+        <el-table-column label="所属学科" prop="subjectName"></el-table-column>
+        <el-table-column label="目录名称" prop="directoryName"></el-table-column>
+        <el-table-column label="创建者" prop="username"></el-table-column>
+        <el-table-column label="创建日期">
           <template slot-scope="scope">
-            <span v-if="scope.row.state == 1">已启用</span>
-            <span v-else>已禁用</span>
+            {{ scope.row.addDate | parseTimeByString }}
           </template>
         </el-table-column>
-        <el-table-column prop="operation" label="操作" class="operation">
-          <button
-            type="button"
-            class="el-button el-button--text el-button--medium"
-            @click="handleDisable"
-          >
-            禁用
-          </button>
-          <button
-            type="disabled"
-            class="el-button el-button--text el-button--medium"
-          >
-            修改
-          </button>
-          <button
-            type="disabled"
-            class="el-button el-button--text el-button--medium"
-          >
-            删除
-          </button>
+        <el-table-column label="面试题数量" prop="totals"></el-table-column>
+        <el-table-column label="状态" prop="state">
+          <template slot-scope="scope">
+            <span>已{{ scope.row.state === 1 ? '启用' : '禁用' }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作">
+          <template slot-scope="scope">
+            <el-button @click="disableList(scope.row)" type="text">{{ scope.row.state === 1 ? '禁用' : '启用' }}</el-button>
+            <el-button @click="editDirectory(scope.row)" type="text" :disabled="scope.row.state === 1">修改</el-button>
+            <el-button @click="deleteList(scope.row.id)" type="text" :disabled="scope.row.state === 1">删除</el-button>
+          </template>
         </el-table-column>
       </el-table>
-      <!-- 分页区域 -->
-      <el-pagination
-        background
-        class="block-right"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :page-size="queryInfo.pagesize"
-        :current-page="queryInfo.pagenum"
-        :page-sizes="[5, 10, 20, 50]"
-        layout="prev, pager, next, sizes, jumper"
-        :total="total"
-      >
-      </el-pagination>
+      <!-- 分页 -->
+       <el-pagination
+          style="float: right; margin: 20px"
+          background
+          @current-change="changePage"
+          @size-change="changeSize"
+          :current-page="reqParams.page"
+          :page-sizes="[5, 10, 15, 20]"
+          :page-size="reqParams.pagesize"
+          layout="prev, pager, next, sizes, jumper"
+          :total="total">
+        </el-pagination>
     </el-card>
+    <directory-add ref="Popup" :oneData="oneData" @addSuccess="succeedOpen"></directory-add>
   </div>
 </template>
 
 <script>
-import { list } from "@/api/hmmm/directorys";
+// 目录列表 api
+import { list as directoryList, changeState, remove } from '@/api/hmmm/directorys'
+// 状态
+import { status } from '@/api/hmmm/constants'
+// 弹层组件
+import DirectoryAdd from '../components/directorys-add'
+
 export default {
-  data() {
+  components: {
+    DirectoryAdd
+  },
+  data () {
     return {
-      // 获取学科目录的参数对象
-      queryInfo: {
-        query: "",
+      // 请求参数
+      reqParams: {
+        // 目录名称
+        directoryName: null,
+        // 状态 1 开启， 0屏蔽
+        state: null,
+        // 学科id，需要根据地址动态获取
+        subjectID: this.$route.query.id,
         page: 1,
-        pagesize: 10,
-        directoryName: "",
+        pagesize: 5
       },
-
-      // 目录列表
-      directorysList: [],
-      // 总数据条数
+      // 目录数据
+      statusList: status,
+      // 表格数据
+      tableData: [],
+      // 总数据
       total: 0,
-
-      directorysTypeList: [{
-        value: 0,
-        table: '禁用'
-      },{
-        value: 1,
-        table: '启用'
-      }]
+      // 需要传给子组件的数据
+      oneData: {}
     }
-    
   },
-  created() {
-    this.getDirectorysList();
+  // 侦听器
+  watch: {
+    '$route.query.id': function () {
+      this.reqParams.page = 1
+      // 从学科过来的，把从地址获取的学科id赋值为学科字段，然后重新渲染，
+      // 但是这是如果点击目录，也需要从地址栏获取，但是获取的是undefined，
+      // 转变为null，重新渲染，就是获取全部的数据
+      this.reqParams.subjectID = this.$route.query.id
+      this.obtainList()
+    }
   },
-  // 加载标签列表
+  created () {
+    this.obtainList()
+  },
   methods: {
-    async getDirectorysList() {
-      const params = {
-        pagesize: this.queryInfo.pagesize,
-        page: this.queryInfo.pagenum,
-        directoryName: this.queryInfo.directoryName,
-        state: this.queryInfo.state,
-      };
-      const { data: res } = await list(params);
-      // if (res.status !== 200) {
-      //   console.log(res.status)
-      //   return this.$message.error ('获取学科目录失败')
-      // }
-      // this.$message.success('获取学科目录成功')
-      console.log(res);
-      this.directorysList = res.items;
-      this.total = res.counts;
-      // this.queryInfo.state = res.
+    // 获取列表
+    async obtainList () {
+      const { data } = await directoryList(this.reqParams)
+      // console.log(data);
+      this.tableData = data.items
+      this.total = data.counts
     },
-    // 操作 禁用按钮点击
-    handleDisable() {},
-
-    handleSizeChange(newSize) {
-      console.log(newSize);
-      this.queryInfo.pagesize = newSize;
-      this.getDirectorysList();
+    // 清空
+    removeform () {
+      this.$refs.directoryForm.resetFields()
+      this.obtainList()
     },
-    handleCurrentChange(newPage) {
-      this.queryInfo.pagenum = newPage;
-      this.getDirectorysList();
+    // 返回学科
+    returnSubject () {
+      this.$router.push({ path: '/list', name: 'subjects-list' })
     },
-    // 点击搜索按钮
-    async onSubmit() {
-      console.log("00000000000000");
-      // this.formInline.page = 1
-      const { data } = await list(this.queryInfo);
-      console.log(data);
-      this.directorysList = data.items;
-      this.total = data.counts;
+    // 新增目录，调用子组件方法
+    addDirectory () {
+      this.oneData = {}
+      this.$nextTick(() => {
+        this.$refs.Popup.open()
+      })
     },
-    // 点击清除
-    onDeleate() {
-      console.log("onDeleate");
-      this.queryInfo.directoryName = ''
-      // this.$refs.formInline.reseFields()
+    // 修改目录
+    editDirectory (row) {
+      this.oneData = row
+      this.$nextTick(() => {
+        this.$refs.Popup.open()
+      })
     },
-  },
-};
+    // 弹窗操作成功
+    succeedOpen () {
+      // 新增的时候需要跳转到第一页
+      if (!this.oneData.id) this.reqParams.page = 1
+      this.obtainList()
+    },
+    // 禁用
+    async disableList (row) {
+      await changeState({ id: row.id, state: row.state === 1 ? row.state = 0 : row.state = 1 })
+      this.$message.success(row.state === 1 ? '启用成功' : '禁用成功')
+    },
+    // 删除
+    deleteList (id) {
+      this.$confirm('此操作将永久删除该目录, 是否继续?', '温馨提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        try {
+          await remove({ id })
+          this.$message.success('删除成功!')
+          this.obtainList()
+        } catch (e) {
+          this.$message.error('删除失败!')
+        }
+      }).catch(() => {})
+    },
+    // 分页
+    changePage (currentPage) {
+      this.reqParams.page = currentPage
+      this.obtainList()
+    },
+    // 分页条数
+    changeSize (currentSize) {
+      this.reqParams.page = 1
+      this.reqParams.pagesize = currentSize
+      this.obtainList()
+    }
+  }
+}
 </script>
 
-<style rel="stylesheet/scss" lang="scss">
-.container {
-  padding: 0;
-}
-.cardTop {
-  margin-top: 10px;
-  margin-left: 10px;
-  margin-right: 10px;
-}
-
-.successButton {
-  position: absolute;
-  right: 40px;
-}
-
-.label {
-  margin-top: 16px;
-}
-.block-right {
-  float: right;
-}
-</style>
-
+<style scoped lang='scss'></style>
