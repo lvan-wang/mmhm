@@ -9,11 +9,11 @@
       <!-- 头部选择区域 -->
       <div class="header_select">
 
-          <el-form ref="form" :model="form" label-width="80px" inline>
+        <el-form ref="form" :model="form" label-width="80px">
             <!-- 第一个 -->
             <div class="header_col">
             <el-form-item label="学科">
-              <el-select @change="selectCatalogue" v-model="form.subjectID" placeholder="请选择" style="width: 100%">
+              <el-select @change="selectCatalogue" v-model="form.subjectID" placeholder="请选择" >
                 <el-option v-for="item, index in subjectList" :key="index" :value="item.value" :label="item.label"></el-option>
               </el-select>
             </el-form-item>
@@ -496,10 +496,11 @@ export default {
 // 头部选择区域
 .header_select {
   margin: 10px;
-
+  overflow: hidden;
   .header_col {
     float: left;
     width: 25%;
+    overflow: hidden;
     .col_left {
       width: 80px;
     }
