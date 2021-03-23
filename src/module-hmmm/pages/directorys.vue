@@ -1,6 +1,14 @@
 <template>
   <div class='container'>
     <el-card class="box-card" style="margin: 10px">
+      <!-- 如果是从学科管理跳转过来的，就需要面包屑了 -->
+      <div slot="header" class="clearfix" v-if="$route.query.id">
+        <el-breadcrumb separator-class="el-icon-arrow-right">
+          <el-breadcrumb-item>学科管理</el-breadcrumb-item>
+          <el-breadcrumb-item>{{ $route.query.name }}</el-breadcrumb-item>
+          <el-breadcrumb-item>目录管理</el-breadcrumb-item>
+        </el-breadcrumb>
+      </div>
       <!-- 布局 -->
       <el-row>
         <el-col :span="18">
@@ -25,6 +33,7 @@
           </el-form>
         </el-col>
         <el-col :span="6" style="text-align: right;">
+          <el-button @click="returnSubject" type="text" icon="el-icon-back" v-if="$route.query.id">返回学科</el-button>
           <el-button @click="addDirectory" type="success" icon="el-icon-edit" size="small">新增目录</el-button>
         </el-col>
       </el-row>
@@ -119,7 +128,7 @@ export default {
   watch: {
     '$route.query.id': function () {
       this.reqParams.page = 1
-      // 把从地址获取的学科id赋值为学科字段，然后重新渲染，
+      // 从学科过来的，把从地址获取的学科id赋值为学科字段，然后重新渲染，
       // 但是这是如果点击目录，也需要从地址栏获取，但是获取的是undefined，
       // 转变为null，重新渲染，就是获取全部的数据
       this.reqParams.subjectID = this.$route.query.id
@@ -137,11 +146,14 @@ export default {
       this.tableData = data.items
       this.total = data.counts
     },
-    
     // 清空
     removeform () {
       this.$refs.directoryForm.resetFields()
       this.obtainList()
+    },
+    // 返回学科
+    returnSubject () {
+      this.$router.push({ path: '/list', name: 'subjects-list' })
     },
     // 新增目录，调用子组件方法
     addDirectory () {
