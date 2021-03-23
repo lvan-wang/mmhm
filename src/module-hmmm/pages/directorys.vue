@@ -137,6 +137,7 @@ export default {
       this.tableData = data.items
       this.total = data.counts
     },
+    
     // 清空
     removeform () {
       this.$refs.directoryForm.resetFields()
