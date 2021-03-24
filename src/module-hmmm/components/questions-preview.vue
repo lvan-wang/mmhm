@@ -72,7 +72,6 @@
       <span>【参考答案】：</span>
       <el-button size="mini" type="danger" @click="clickVideoBtn">视频答案预览</el-button>
       <div v-show="videoShow" class="video">
-        <img src="../../yJpeR9B9vr.png" @click="clickVideoBtn">
         <video :src="row.videoURL" autoplay controls="controls" style="width: 50%">
         您的浏览器不支持 video 标签。
         </video>
