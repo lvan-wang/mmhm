@@ -78,11 +78,10 @@
         </el-form-item>
         
         <input type="file" style="display:none" ref="inputFile">
-        <!-- 选项 -->
+        <!-- 选项 如果是简答题就不显示选项-->
         <el-form-item label="选项：" class="optionWidth" v-show="form.questionType !== '3'">
           <!-- 添加的情况 -->
           <div v-if="id === '0' || id === ':id'">
-            <!-- <el-checkbox label="复选框 A"></el-checkbox> -->
             <!-- 单选题 -->
             <div v-if="form.questionType === '1'">
              <el-radio-group v-model="optionsNum">
