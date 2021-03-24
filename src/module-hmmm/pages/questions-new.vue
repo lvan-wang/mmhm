@@ -14,9 +14,9 @@
         </el-form-item>
         
         <!-- 目录 -->
-        <el-form-item label="目录：">
+        <el-form-item label="目录：" prop="catalogID">
           <el-select v-model="form.catalogID" placeholder="请选择目录" class="select_content">
-            <el-option v-for="item, index in twoLevelDirectory" :key="index" :label="item" :value="item"></el-option>
+            <el-option v-for="item, index in twoLevelDirectory" :key="index" :label="item.directoryName" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
 
@@ -207,7 +207,7 @@ export default {
       form: {
         id: '',
         subjectID: '', // 学科的相关数据
-        catalogID: 0, // 二级目录的数据
+        catalogID: '', // 二级目录的数据
         direction: '', // 方向
         questionType: '1', // 试题类型
         difficulty: '1', // 难度
@@ -237,9 +237,9 @@ export default {
           { required: true, message: '请选择学科', trigger: 'blur' }
         ],
         // 目录的验证规则
-        // catalogID: [
-        //   { required: true, message: '请选择学科', trigger: 'blur' }
-        // ],
+        catalogID: [
+          { required: true, message: '请选择目录', trigger: 'blur' }
+        ],
         // 方向的验证规则
         direction: [
           { required: true, message: '请选择方向', trigger: 'blur' }
@@ -353,10 +353,10 @@ export default {
       try {
         // 获取学科二级目录的请求
         console.log(this.form.subjectID)
-        const { data } = await createAPI(`/directorys/${this.form.subjectID}`, 'get')
+        const { data } = await createAPI('/directorys/', 'get')
         // const { data } = await detail(id)
         console.log(data)
-        this.twoLevelDirectory = data.twoLevelDirectory
+        this.twoLevelDirectory = data.items
 
         // 获取当前试题标签的请求
         const res = await createAPI('/tags/' + this.form.subjectID, 'get')
