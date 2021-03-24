@@ -58,7 +58,7 @@
         </el-table-column>
         <el-table-column prop="addDate" label="创建日期">
           <template slot-scope="scope">
-              <span>{{scope.row.addDate | parseTime}}</span>
+              <span>{{scope.row.addDate | parseTimeByString }}</span>
             </template>
         </el-table-column>
         <el-table-column label="状态" prop="state">
@@ -76,11 +76,11 @@
 
             <el-button size="mini" type="primary"
             @click="addEditTags(scope.row.id)"
-            v-bind:disabled="scope.row.state"
+            v-bind:disabled="scope.row.state === 1"
             >编辑</el-button>
             <el-button size="mini" type="danger"
             @click="removeTags(scope.row.id)"
-            v-bind:disabled="scope.row.state"
+            v-bind:disabled="scope.row.state === 1"
             >删除</el-button>
           </template>
         </el-table-column>
