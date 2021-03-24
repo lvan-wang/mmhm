@@ -16,7 +16,7 @@
             v-model="formBase.subjectName"
             filterable
           >
-            <el-option v-for="item in subjectList" :key="item" :value="item.value" :label="item.label"></el-option>
+            <el-option v-for="(item, index) in subjectList" :key="index" :value="item.value" :label="item.label"></el-option>
           </el-select>
           </el-form-item>
       <el-form-item label="标签名称" prop="tagName">

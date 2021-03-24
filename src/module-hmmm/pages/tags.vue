@@ -76,11 +76,11 @@
 
             <el-button size="mini" type="primary"
             @click="addEditTags(scope.row.id)"
-            :disabled="scope.row.state"
+            v-bind:disabled="scope.row.state"
             >编辑</el-button>
             <el-button size="mini" type="danger"
             @click="removeTags(scope.row.id)"
-            :disabled="scope.row.state"
+            v-bind:disabled="scope.row.state"
             >删除</el-button>
           </template>
         </el-table-column>
