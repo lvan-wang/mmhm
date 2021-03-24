@@ -1,19 +1,19 @@
 <template>
-  <div class='container'>题组管理
+  <div class='container'>
     <el-card>
       <!-- 头部导语和按钮 -->
       <div class="card_header">
         <span class="header_text">说明：目前支持学科和关键字条件筛选</span>
-        <el-button type="success" icon="el-icon-edit" size="small" @click="$router.push('/questions/new')">新增试题</el-button>
+        <el-button type="success" icon="el-icon-edit" size="small" @click="$router.push('/questions/new/0')">新增试题</el-button>
       </div>
       <!-- 头部选择区域 -->
       <div class="header_select">
 
-          <el-form ref="form" :model="form" label-width="80px">
+        <el-form ref="form" :model="form" label-width="80px">
             <!-- 第一个 -->
             <div class="header_col">
             <el-form-item label="学科">
-              <el-select @change="selectCatalogue" v-model="form.subjectID" placeholder="请选择" style="width: 100%">
+              <el-select @change="selectCatalogue" v-model="form.subjectID" placeholder="请选择" >
                 <el-option v-for="item, index in subjectList" :key="index" :value="item.value" :label="item.label"></el-option>
               </el-select>
             </el-form-item>
@@ -25,9 +25,8 @@
           <!-- <el-form ref="form" :model="form" label-width="80px"> -->
             <div class="header_col">
             <el-form-item label="二级目录">
-              <el-select v-model="form.region" placeholder="请选择" style="width: 100%">
-                <el-option label="区域一" value="shanghai"></el-option>
-                <el-option label="区域二" value="beijing"></el-option>
+              <el-select v-model="form.catalogID" placeholder="请选择" style="width: 100%">
+                <el-option v-for="item, index in twoLevelDirectory" :key="index" :label="item" :value="item"></el-option>
               </el-select>
             </el-form-item>
             </div>
@@ -39,7 +38,7 @@
             <div class="header_col">
             <el-form-item label="标签">
               <el-select v-model="form.tags" placeholder="请选择" style="width: 100%">
-                <el-option label="无数据" value="0"></el-option>
+                <el-option v-for="item, index in tagName" :key="index" :label="item" :value="item"></el-option>
               </el-select>
             </el-form-item>
             </div>
@@ -108,12 +107,29 @@
             </el-form-item>
         </div>
         <!-- 十一 -->
-        <!-- <div class="header_col">
-          <el-form ref="form" :model="form" label-width="80px"> -->
             <div class="header_col">
-            <el-form-item label="城市">
+            <!-- <el-form-item label="城市">
               <el-cascader v-model="form.city" :options="cityData" style="width:100%"></el-cascader>
-            </el-form-item>
+            </el-form-item> -->
+
+              <el-form-item label="城市：">
+                <el-select @change="selectProvinces" v-model="form.province" placeholder="请选择" style="width:110px;">
+                  <el-option
+                  v-for="item, index in provinces"
+                  :key="index"
+                  :label="item"
+                  :value="item">
+                </el-option>
+                </el-select>
+                <el-select v-model="form.city" placeholder="请选择"  style="width:110px;">
+                <el-option
+                  v-for="item, index in citys"
+                  :key="index"
+                  :label="item"
+                  :value="item">
+                </el-option>
+              </el-select>
+              </el-form-item>
             </div>
         </el-form>
         
@@ -166,7 +182,8 @@
             <template slot-scope="scope">
               <!-- 预览按钮 -->
               <el-button size="small" type="primary" icon="el-icon-view" :plain="true" circle @click="previewBtn(scope.row)"></el-button>
-              <el-button size="small" type="success" icon="el-icon-edit" :plain="true" circle></el-button>
+              <!-- 修改按钮 -->
+              <el-button size="small" type="success" icon="el-icon-edit" :plain="true" circle @click="$router.push(`/questions/new/${scope.row.id}`)"></el-button>
               <!-- 删除按钮 -->
               <el-button size="small" type="danger" icon="el-icon-delete" :plain="true" circle @click="removeUserById(scope.row.id)"></el-button>
               <!-- 加入精选 -->
@@ -196,7 +213,7 @@
       >
       <span>
         <!-- 子组件 -->
-        <questions-preview :row='row'></questions-preview>
+        <questions-preview v-if="previewVisible" :row='row'></questions-preview>
       </span>
       <div class="close">
         <el-button type="primary" @click="previewVisible = false" >关闭</el-button>
@@ -206,12 +223,13 @@
 </template>
 
 <script>
-import cityData from '../citydata'
+// import cityData from '../citydata'
 import { list, remove, choiceAdd } from '../../api/hmmm/questions'
 import { simple, detail } from '../../api/hmmm/subjects'
 
 import { createAPI } from '@/utils/request'
 import QuestionsPreview from '../components/questions-preview'
+import {citys, provinces} from '../../api/hmmm/citys'
 export default {
   name: 'BasicQuestions',
   components: {
@@ -223,6 +241,8 @@ export default {
       total: 0, // 总数据条数
       subjectList: [], // 学科数据
       setRecords: [], // 录入人数据
+      twoLevelDirectory: [], // 学科的二级目录
+      tagName: [], // 学科的标签
       // form 表单提交的所有数据
       form: {
         page: 1,
@@ -235,13 +255,16 @@ export default {
         creatorID: '', // 录入人
         remarks: '', // 题目备注
         shortName: '', // 企业简称
-        tags: '', // 标签
-        city: '', //城市
+        tags: [], // 标签
+        province: '', // 市
+        city: '', //区
         catalogID: '' // 目录
       },
+      provinces: provinces(), // 市
+      citys: [], // 县
       // 省市的联动
-      cityData: cityData,
-      currentPage4: 4,
+      // cityData: cityData,
+      // currentPage4: 4,
       // 分页区域的参数
       queryInfo: {
         pagenum: 1,
@@ -303,7 +326,7 @@ export default {
           }
       try {
         const { data } = await list(query)
-        console.log(data)
+        // console.log(data)
         this.list = data.items
         this.total = data.counts
       } catch (err) {
@@ -338,7 +361,7 @@ export default {
     // 预览功能的按钮
     previewBtn (row) {
       this.previewVisible = true
-      console.log(row)
+      // console.log(row)
       this.row = row
     },
     // 每页容量变化刷新页面
@@ -367,19 +390,18 @@ export default {
         return this.$message.info('取消了加入精选')
       }
       // 确定要加入精选 发起请求
-      // TODO: 发起请求添加到精选中
       const data = {
         id: row.id,
-        choiceState: 0
+        choiceState: 1
       }
       try {
         await choiceAdd(data)
         this.$message.success('加入精选成功')
+        this.getList()
       } catch (err) {
         this.$message.error('加入精选失败')
       }
       
-
     },
     // 获取学科列表
     async getsubject () {
@@ -415,7 +437,8 @@ export default {
       this.form.remarks = '', // 题目备注
       this.form.shortName = '', // 企业简称
       this.form.tags = '' // 标签
-      this.form.city = '' // 城市
+      this.form.province = '' // 城市
+      this.form.city = '' // 城区
     },
     // 搜索按钮
     async search () {
@@ -429,14 +452,29 @@ export default {
       }
     },
     async selectCatalogue () {
+      this.tagName = []
       try {
+        // 获取学科二级目录的请求
         console.log(this.form.subjectID)
         const id = {id: this.form.subjectID}
         const { data } = await detail(id)
-        console.log(data)
+        // console.log(data)
+        this.twoLevelDirectory = data.twoLevelDirectory
+
+        // 获取当前学科标签的请求
+        const res = await createAPI('/tags/' + this.form.subjectID, 'get')
+        console.log(res)
+        this.tagName.push(res.data.tagName)
+
       } catch (err) {
-        this.$message.error('获取二级目录失败')
       }
+    },
+    // 选择城市下拉框的change事件
+    selectProvinces (provinces) {
+      // console.log(provinces)
+      this.citys = []
+      const res =  citys(provinces)
+      this.citys = res
     }
   },
   computed: {
@@ -458,10 +496,11 @@ export default {
 // 头部选择区域
 .header_select {
   margin: 10px;
-
+  overflow: hidden;
   .header_col {
     float: left;
     width: 25%;
+    overflow: hidden;
     .col_left {
       width: 80px;
     }
@@ -477,6 +516,8 @@ export default {
   // 分页区域
   .paging_btn {
     float: right;
+    height: 60px;
+    overflow: hidden;
     .el-pagination {
       padding: 20px 10px;
     }

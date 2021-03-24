@@ -15,12 +15,19 @@ import './mock' // simulation data
 import 'font-awesome/css/font-awesome.css'
 // 导入全局样式表
 import './styles/global.css'
+// 导入富文本编辑器
+import VueQuillEditor from 'vue-quill-editor'
 /*
  * 注册 - 业务模块
  */
 import dashboard from '@/module-dashboard/' // 面板
 import base from '@/module-manage/' // 用户管理
 import hmmm from '@/module-hmmm/' // 黑马面面
+
+// 富文本编辑器对应的样式
+import 'quill/dist/quill.core.css' // import styles
+import 'quill/dist/quill.snow.css' // for snow theme
+import 'quill/dist/quill.bubble.css' // for bubble theme
 
 Vue.use(dashboard, store)
 Vue.use(base, store)
@@ -42,6 +49,9 @@ Vue.use(Element, {
 Object.keys(filters).forEach(key => {
   Vue.filter(key, filters[key])
 })
+
+// 全局挂载富文本编辑器
+Vue.use(VueQuillEditor /* { default global options } */)
 
 Vue.config.productionTip = false
 
