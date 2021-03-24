@@ -122,7 +122,22 @@
                     @click="item.isRight = !item.isRight"
                     ></el-checkbox>
                 <el-input v-model="item.title"></el-input>
-                <el-button class="onpicBtn" @click="$refs.inputFile.click()">上传图片<i class="el-icon-circle-close icon_close"></i></el-button>
+                <!-- <el-button class="onpicBtn" @click="$refs.inputFile.click()">上传图片<i class="el-icon-circle-close icon_close"></i></el-button> -->
+                <!-- 上传 -->
+                    <el-upload
+                      class="avatar-uploader"
+                      action="https://www.liulongbin.top:8888/api/private/v1/upload"
+                      :headers='headerObj'
+                      :on-success="(res, file) => { updateImg(item, res, file) }"
+                      :show-file-list="false"
+                      :on-remove="handleRemove"
+                      >
+                      
+                        <img v-if="item.img" :src="item.img" class="avatar">
+                      <el-button v-else class="onpicBtn" >上传图片
+                        <i class="el-icon-circle-close icon_close"></i>
+                      </el-button>
+                    </el-upload>
                 </div>
               </el-checkbox-group>
               </div>
@@ -456,16 +471,29 @@ export default {
         if (!valid) return this.$message.error('请将必填项填写完成！')
         // 成功之后再发起请求
       try {
-        // 判断单选或者多选的情况
+        // 判断单选或者多选的情况  如果单选则让选中项IDRight变为高亮
         if (this.form.questionType === '1') {
-          var newradio = this.optionCheckbox.find(item => {
+          var optionCheckboxIndex = this.optionCheckbox.findIndex(item => {
             return item.id = this.optionsNum
           })
-          console.log(newradio)
-
+          console.log(optionCheckboxIndex)
+          this.optionCheckbox[optionCheckboxIndex].isRight = 1
         }
+        // 如果多选则让选中项IDRight变为高亮
+        // if (this.form.questionType === '2') {
+        //   optionCheckbox.forEach(item => {
+        //     this.optionsArr.forEach(rightID => {
+        //        if (item.id === rightID) {
+        //         item.isRight = 1
+        //       }
+        //     })
+        //   })
+        // }
+        
+        // 标签是数字的问题
         this.form.tags = this.form.tags + ''
 
+        console.log(this.form)
         // 把数据存入form.options中
         this.form.options = this.optionCheckbox
         const { data } = await add(this.form)
