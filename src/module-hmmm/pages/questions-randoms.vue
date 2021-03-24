@@ -1,6 +1,6 @@
 <template>
 <!-- 头部 -->
-<!-- 头部 -->
+
   <div class='container'><el-card>
       <div class="guanjianziwaikuang">
         <span class="guanjianzi">关键字</span>
@@ -18,7 +18,8 @@
           <!-- 表格 -->
     <el-table
       :data="dataList"
-      style="width: 100%">
+      style="width: 100%"
+      class="zutibiaoge">
       <el-table-column
         prop="id"
         label="编号"
@@ -27,12 +28,18 @@
       <el-table-column
         prop="questionType"
         label="题型"
-        width="180">
+        width="100">
+        <template slot-scope="scope">
+          <p v-if="scope.row.questionType === '1'">单选</p>
+          <p v-else-if="scope.row.questionType === '2'">多选</p>
+          <p v-else>简答</p>
+        </template>
       </el-table-column>
       <el-table-column
-        label="题目编号">
+        label="题目编号"
+        width="200">
         <template slot-scope="scope">
-          <span v-for="item, index in scope.row.questionIDs" :key="index"><a href="javascript:;" class="timubianhao">{{item.number}}<br></a></span>
+          <span v-for="item, index in scope.row.questionIDs" :key="index"><a href="javascript:;" class="timubianhao" @click="previewBtn(item.id)">{{item.number}}<br></a></span>
         </template>
       </el-table-column>
       <el-table-column
@@ -60,6 +67,20 @@
         </template>
       </el-table-column>
     </el-table>
+    <!-- 弹出层 -->
+    <el-dialog
+      title="题目预览"
+      :visible.sync="previewVisible"
+      width="60%"
+      >
+      <span>
+         <!-- 子组件 -->
+        <questions-preview v-if="previewVisible" :row='row'></questions-preview>
+      </span>
+      <div class="close">
+        <el-button type="primary" @click="previewVisible = false" >关闭</el-button>
+      </div>
+    </el-dialog>
     <!-- 分页 -->
     <div class="fenyeyouyi">
      <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="queryInfo.page" :page-sizes="[20, 30, 50, 100]" :page-size="queryInfo.pagesize" layout="prev, pager, next, total, sizes, jumper" :total="total">
@@ -73,7 +94,13 @@
 <script>
 import { randoms } from '@/api/hmmm/questions'
 import { removeRandoms } from '@/api/hmmm/questions'
+import { detail } from '@/api/hmmm/questions'
+import QuestionsPreview from '../components/questions-preview'
 export default {
+  name:'questionsRandoms',
+  components: {
+    QuestionsPreview 
+  },
   data (){
     return {
       // 获取学科列表的参数对象
@@ -86,6 +113,44 @@ export default {
       total: null,
       //列表
       dataList: [],
+      //弹出框
+      previewVisible: false, // 预览按钮的弹出框
+      row: {}, // 点击当前这一行所有的数据
+      // 试题类型
+      questionTypeList: [{
+          value: '1',
+          label: '单选'
+        }, {
+          value: '2',
+          label: '多选'
+        }, {
+          value: '3',
+          label: '简答'
+        }
+      ],
+      // 难度
+      regionList: [{
+          value: '1',
+          label: '简单'
+        }, {
+          value: '2',
+          label: '一般'
+        }, {
+          value: '3',
+          label: '困难'
+        }
+      ],
+      // 方向
+      directionList: [
+        { value: 'o2o', label: 'o2o'},
+        { value: '外包服务', label: '外包服务'},
+        { value: '企业服务', label: '企业服务'},
+        { value: '互联网金融', label: '互联网金融'},
+        { value: '企业咨询', label: '企业咨询'},
+        { value: '互联网', label: '互联网'},
+        { value: '电子商务', label: '电子商务'},
+        { value: '其他', label: '其他'}
+      ]
     }
   },
   created (){
@@ -125,11 +190,19 @@ export default {
     this.$message.success('删除成功')
     this.getQuestionsList()
     },
+    // 预览功能的按钮
+    async previewBtn (id) {
+      const { data } = await detail({ id })
+      console.log(id);
+      this.previewVisible = true
+      this.row = data
+      console.log(data);
+    },
   }
 }
 </script>
 
-<style rel="stylesheet/scss" lang="scss">
+<style scoped rel="stylesheet/scss" lang="scss">
 .guanjianziwaikuang {
   margin-bottom: 20px;
 }
@@ -175,5 +248,13 @@ export default {
 .el-pagination {
   position: absolute;
   right: 42px;
+}
+.close {
+  padding: 10px 20px 10px;
+  text-align: right;
+  box-sizing: border-box;
+}
+.zutibiaoge{
+  min-width: 1000px;
 }
 </style>

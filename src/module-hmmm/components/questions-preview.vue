@@ -24,11 +24,13 @@
       </div>
       <div class="header_text">
         <span>【学科】：</span>
+        <span>{{row.subjectName}}</span>
         <span>{{row.subject}}</span>
       </div>
       <div class="header_text">
         <span>【目录】：</span>
         <span>{{row.catalog}}</span>
+        <span>{{row.directoryName}}</span>
       </div>
       <div class="header_text">
         <span>【方向】：</span>
@@ -70,21 +72,20 @@
       <span>【参考答案】：</span>
       <el-button size="mini" type="danger" @click="clickVideoBtn">视频答案预览</el-button>
       <div v-show="videoShow" class="video">
-        <img src="../../yJpeR9B9vr.png" @click="clickVideoBtn">
         <video :src="row.videoURL" autoplay controls="controls" style="width: 50%">
         您的浏览器不支持 video 标签。
         </video>
       </div>
     </div>
     <!-- 答案解析 -->
-    <div class="common">
-      <span>【答案解析】：</span>
-      <span>无</span>
+    <div class="common daanjiexibox">
+      <span >【答案解析】：</span>
+      <span class="daanjiexi" v-html="row.answer">{{row.answer}}</span>
     </div>
     <!-- 题目备注 -->
     <div class="remark">
       <span>【题目备注】：</span>
-      <span>无</span>
+      <span>{{row.remarks}}</span>
     </div>
   </div>
 </template>
@@ -107,7 +108,7 @@ export default {
     }
   },
   created () {
-    console.log(this.row)
+    // console.log(this.row)
     this.getAnswer()
   },
   methods: {
@@ -185,5 +186,12 @@ export default {
 }
 .questionType_checkbox {
   padding: 5px 0;
+}
+.daanjiexibox {
+  position: relative;
+}
+.daanjiexi {
+  position: absolute;
+  bottom: 0px;
 }
 </style>
