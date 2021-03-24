@@ -89,7 +89,21 @@
               <div class="block" v-for="item, index in optionCheckbox" :key="index" >
                 <el-radio :label="item.id">{{item.code}}</el-radio>
                 <el-input v-model="item.title"></el-input>
-                <el-button class="onpicBtn" @click="$refs.inputFile.click()">上传图片<i class="el-icon-circle-close icon_close"></i></el-button>
+                 <!-- 上传 -->
+                    <el-upload
+                      class="avatar-uploader"
+                      action="https://www.liulongbin.top:8888/api/private/v1/upload"
+                      :headers='headerObj'
+                      :on-success="(res, file) => { updateImg(item, res, file) }"
+                      :show-file-list="false"
+                      :on-remove="handleRemove"
+                      >
+                      
+                        <img v-if="item.img" :src="item.img" class="avatar">
+                      <el-button v-else class="onpicBtn" >上传图片
+                        <i class="el-icon-circle-close icon_close"></i>
+                      </el-button>
+                    </el-upload>
               </div>
 
               <!-- 添加选项的按钮 -->
@@ -169,10 +183,10 @@
           <el-input type="textarea"  class="select_content" v-model="form.remarks"></el-input>
         </el-form-item>
 
-        <!-- 试题标签 -->
+        <!-- 试题标签 multiple -->
         <el-form-item label="试题标签：" >
-          <el-select v-model="form.tags" placeholder="请选择试题标签" class="select_content">
-                <el-option v-for="item, index in tagName" :key="index" :label="item" :value="item"></el-option>
+          <el-select v-model="form.tags"  placeholder="请选择试题标签"  class="select_content">
+                <el-option v-for="item, index in tagName" :key="index" :label="item.tagName" :value="item.tagName"></el-option>
               </el-select>
         </el-form-item>
 
@@ -193,6 +207,7 @@ import { detail, add, update } from '@/api/hmmm/questions'
 import { createAPI } from '@/utils/request'
 import { list } from '../../api/hmmm/companys'
 import {citys, provinces} from '../../api/hmmm/citys'
+import { mapState } from 'vuex'
 export default {
   name: 'New',
   data () {
@@ -221,6 +236,7 @@ export default {
         name: '',
         options: [] // 选项
       },
+      newtags: [],
       radio: 3,
       provinces: provinces(), // 市
       // provincesName: '',
@@ -311,9 +327,16 @@ export default {
       // 单选的情况
       optionsNum: '',
       // 多选的情况
-      optionsArr: []
+      optionsArr: [],
+      // 图片上传组件的请求头配置对象
+      headerObj: {
+        Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjUwMCwicmlkIjowLCJpYXQiOjE2MTY1ODIyMzQsImV4cCI6MTYxNjY2ODYzNH0.t3jGjqvaPhrG-BUEo2KI4rGQtfYA7vxz4r0vnV2ykQM'
+      },
 
     }
+  },
+  computed: {
+    ...mapState(['token']),
   },
   props: {
     id: {
@@ -358,9 +381,10 @@ export default {
         this.twoLevelDirectory = data.items
 
         // 获取当前试题标签的请求
-        const res = await createAPI('/tags/' + this.form.subjectID, 'get')
+        // const res = await createAPI('/tags/' + this.form.subjectID, 'get')
+        const res = await createAPI('/tags/', 'get')
         console.log(res)
-        this.tagName.push(res.data.tagName)
+        this.tagName = res.data.items
 
       } catch (err) {
       }
@@ -440,6 +464,8 @@ export default {
           console.log(newradio)
 
         }
+        this.form.tags = this.form.tags + ''
+
         // 把数据存入form.options中
         this.form.options = this.optionCheckbox
         const { data } = await add(this.form)
@@ -485,7 +511,23 @@ export default {
       list.id = this.newId++
       this.optionCheckbox.push(list)
 
-    }
+    },
+    // 上传成功, 把返回的图片地址，赋值预览图片
+    updateImg (item, response, file) {
+      item.img = URL.createObjectURL(file.raw)
+      console.log(item.img)
+    },
+    // 移除上传的图片
+    removeImg (currentImg, index) {
+      // 如果有图片，就把当前图片清空
+      if (currentImg) {
+        this.reqParams.options[index].img = ''
+        // console.log(this.reqParams.options[index].img)
+      }
+    },
+    handleRemove(file, fileList) {
+      console.log(file, fileList);
+    },
     
   }
 }
@@ -534,5 +576,15 @@ export default {
 
 .footer {
   margin-left: 140px;
+}
+.avatar-uploader{
+  position: relative;
+  vertical-align: middle;
+  line-height: 1;
+}
+.avatar {
+  margin: 0 0 0 8px;
+  width: 100px;
+  height: 60px;
 }
 </style>
