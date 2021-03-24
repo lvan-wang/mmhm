@@ -52,8 +52,10 @@
           <div v-for="item, index in options" :key="index" class="questionType_checkbox">
             <el-checkbox-group :value="checkboxItem">
               <el-checkbox :label="item.title" ></el-checkbox>
+              <img v-if="item.img" class="timutupian" :src="item.img">
             </el-checkbox-group>
           </div>
+          
         </div>
         <!-- 多选题的情况 -->
         <div v-else-if="row.questionType === '2'">
@@ -193,5 +195,11 @@ export default {
 .daanjiexi {
   position: absolute;
   bottom: 0px;
+}
+.timutupian {
+  margin: 0 20px;
+  vertical-align: top;
+  width: 100px;
+  height: 100px;
 }
 </style>
