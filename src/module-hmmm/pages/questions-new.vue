@@ -23,7 +23,7 @@
         <!-- 企业 -->
         <el-form-item label="企业：" prop="enterpriseID">
           <el-select v-model="form.enterpriseID" placeholder="请选择企业" class="select_content">
-            <el-option v-for="item, index in companysList" :key="index" :label="item.company" :value="item.creatorID"></el-option>
+            <el-option v-for="item, index in companysList" :key="index" :label="item.company" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
 
@@ -85,7 +85,7 @@
             <!-- <el-checkbox label="复选框 A"></el-checkbox> -->
             <!-- 单选题 -->
             <div v-if="form.questionType === '1'">
-             <el-radio-group v-model="options">
+             <el-radio-group v-model="optionsNum">
 
               <div class="block" v-for="item, index in optionCheckbox" :key="index" >
                 <el-radio :label="item.id">{{item.code}}</el-radio>
@@ -103,10 +103,10 @@
             <!-- 多选题 -->
             <div v-else>
               <div v-for="item, index in optionCheckbox" :key="index" class="questionType_checkbox">
-              <el-checkbox-group v-model="form.options">
+              <el-checkbox-group v-model="optionsArr">
                 <div class="block">
                     <el-checkbox :label="item.code" style="width:80px"
-                    @click="item.optionCheckbox.isRight = !item.optionCheckbox.isRight"
+                    @click="item.isRight = !item.isRight"
                     ></el-checkbox>
                 <el-input v-model="item.title"></el-input>
                 <el-button class="onpicBtn" @click="$refs.inputFile.click()">上传图片<i class="el-icon-circle-close icon_close"></i></el-button>
@@ -283,30 +283,37 @@ export default {
           code: 'A：',
           title: '',
           img: '',
-          isRight: false
+          isRight: 0
         },
         {
           id: 2,
           code: 'B：',
           title: '',
           img: '',
-          isRight: false
+          isRight: 0
         },
         {
           id: 3,
           code: 'C：',
           title: '',
           img: '',
-          isRight: false
+          isRight: 0
         },
         {
           id: 4,
           code: 'D：',
           title: '',
           img: '',
-          isRight: false
+          isRight: 0
         }
-      ]
+      ],
+      newId: 5,
+      newCode: 69,
+      // 单选的情况
+      optionsNum: '',
+      // 多选的情况
+      optionsArr: []
+
     }
   },
   props: {
@@ -426,6 +433,16 @@ export default {
         if (!valid) return this.$message.error('请将必填项填写完成！')
         // 成功之后再发起请求
       try {
+        // 判断单选或者多选的情况
+        if (this.form.questionType === '1') {
+          var newradio = this.optionCheckbox.find(item => {
+            return item.id = this.optionsNum
+          })
+          console.log(newradio)
+
+        }
+        // 把数据存入form.options中
+        this.form.options = this.optionCheckbox
         const { data } = await add(this.form)
         console.log(data)
         this.$message.success('新增题库成功')
@@ -455,14 +472,20 @@ export default {
     },
     // 点击添加选项按钮时添加一个选项
     addOptions () {
+      if (this.newCode > 90) {
+        return this.$message.info('选项不能再多了！')
+      }
       const list = {
-          id: 4,
-          code: 'D：',
+          id: '',
+          code: '',
           title: '',
           img: '',
           isRight: false
-        }
+      }
+      list.code = String.fromCharCode(this.newCode++)
+      list.id = this.newId++
       this.optionCheckbox.push(list)
+
     }
     
   }
@@ -498,6 +521,7 @@ export default {
   position: relative;
   border: 1px dashed #999;
   height: 50px;
+  margin-left: 10px;
   .icon_close {
     position: absolute;
     right: -8px;
