@@ -88,7 +88,8 @@
       <!-- /数据列表 -->
 
       <!-- 分页 -->
-      <el-pagination
+      <div class="pagination">
+        <el-pagination
       background
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
@@ -98,6 +99,7 @@
       layout="total, sizes, prev, pager, next, jumper"
       :total="total">
       </el-pagination>
+      </div>
       <!-- /分页 -->
       <!-- 新增标签弹层 -->
         <Dialog ref="editTags" :titleInfo="titleInfo" :formBase="formData" v-on:newDataes="loadTagsList"></Dialog>
@@ -272,8 +274,9 @@ export default {
   .el-table {
     padding-top: 20px;
   }
-  .el-pagination {
-    padding: 20px 10px;
+  .pagination {
+    padding-top: 20px;
+    height:75px;
     float: right;
   }
 }
