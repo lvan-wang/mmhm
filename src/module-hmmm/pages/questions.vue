@@ -154,9 +154,9 @@
           stripe
           style="width: 100%">
           <el-table-column label="试题编号" prop="number" width="230"></el-table-column>
-          <el-table-column label="学科" prop="subject" width="50"></el-table-column>
-          <el-table-column label="目录" prop="catalog" width="100"></el-table-column>
-          <el-table-column label="题型" prop="questionType" width="80">
+          <el-table-column label="学科" prop="subject" width="60"></el-table-column>
+          <el-table-column label="目录" prop="catalog" width="110"></el-table-column>
+          <el-table-column label="题型" prop="questionType" width="100">
             <template slot-scope="scope">
               <span v-if="scope.row.questionType === '1'">单选题</span>
               <span v-else-if="scope.row.questionType === '2'">多选题</span>
@@ -168,8 +168,12 @@
               <span v-html="scope.row.question"></span>
             </template>
           </el-table-column>
-          <el-table-column label="录入时间" prop="addDate" width="150"></el-table-column>
-          <el-table-column label="难度" prop="difficulty" width="50">
+          <el-table-column label="录入时间" prop="addDate" width="180">
+            <template slot-scope="scope">
+              {{scope.row.addDate | parseTimeByString}}
+            </template>
+          </el-table-column>
+          <el-table-column label="难度" prop="difficulty" width="70">
             <template slot-scope="scope">
               <span v-if="scope.row.difficulty === '1'">简单</span>
               <span v-else-if="scope.row.difficulty === '2'">一般</span>

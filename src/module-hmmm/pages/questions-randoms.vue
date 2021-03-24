@@ -18,7 +18,8 @@
           <!-- 表格 -->
     <el-table
       :data="dataList"
-      style="width: 100%">
+      style="width: 100%"
+      class="zutibiaoge">
       <el-table-column
         prop="id"
         label="编号"
@@ -27,7 +28,7 @@
       <el-table-column
         prop="questionType"
         label="题型"
-        width="180">
+        width="100">
         <template slot-scope="scope">
           <p v-if="scope.row.questionType === '1'">单选</p>
           <p v-else-if="scope.row.questionType === '2'">多选</p>
@@ -35,7 +36,8 @@
         </template>
       </el-table-column>
       <el-table-column
-        label="题目编号">
+        label="题目编号"
+        width="200">
         <template slot-scope="scope">
           <span v-for="item, index in scope.row.questionIDs" :key="index"><a href="javascript:;" class="timubianhao" @click="previewBtn(item.id)">{{item.number}}<br></a></span>
         </template>
@@ -251,5 +253,8 @@ export default {
   padding: 10px 20px 10px;
   text-align: right;
   box-sizing: border-box;
+}
+.zutibiaoge{
+  min-width: 1000px;
 }
 </style>

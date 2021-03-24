@@ -14,16 +14,16 @@
         </el-form-item>
         
         <!-- 目录 -->
-        <el-form-item label="目录：">
+        <el-form-item label="目录：" prop="catalogID">
           <el-select v-model="form.catalogID" placeholder="请选择目录" class="select_content">
-            <el-option v-for="item, index in twoLevelDirectory" :key="index" :label="item" :value="item"></el-option>
+            <el-option v-for="item, index in twoLevelDirectory" :key="index" :label="item.directoryName" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
 
         <!-- 企业 -->
         <el-form-item label="企业：" prop="enterpriseID">
           <el-select v-model="form.enterpriseID" placeholder="请选择企业" class="select_content">
-            <el-option v-for="item, index in companysList" :key="index" :label="item.company" :value="item.creatorID"></el-option>
+            <el-option v-for="item, index in companysList" :key="index" :label="item.company" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
 
@@ -78,14 +78,13 @@
         </el-form-item>
         
         <input type="file" style="display:none" ref="inputFile">
-        <!-- 选项 -->
+        <!-- 选项 如果是简答题就不显示选项-->
         <el-form-item label="选项：" class="optionWidth" v-show="form.questionType !== '3'">
           <!-- 添加的情况 -->
           <div v-if="id === '0' || id === ':id'">
-            <!-- <el-checkbox label="复选框 A"></el-checkbox> -->
             <!-- 单选题 -->
             <div v-if="form.questionType === '1'">
-             <el-radio-group v-model="options">
+             <el-radio-group v-model="optionsNum">
 
               <div class="block" v-for="item, index in optionCheckbox" :key="index" >
                 <el-radio :label="item.id">{{item.code}}</el-radio>
@@ -103,10 +102,10 @@
             <!-- 多选题 -->
             <div v-else>
               <div v-for="item, index in optionCheckbox" :key="index" class="questionType_checkbox">
-              <el-checkbox-group v-model="form.options">
+              <el-checkbox-group v-model="optionsArr">
                 <div class="block">
                     <el-checkbox :label="item.code" style="width:80px"
-                    @click="item.optionCheckbox.isRight = !item.optionCheckbox.isRight"
+                    @click="item.isRight = !item.isRight"
                     ></el-checkbox>
                 <el-input v-model="item.title"></el-input>
                 <el-button class="onpicBtn" @click="$refs.inputFile.click()">上传图片<i class="el-icon-circle-close icon_close"></i></el-button>
@@ -207,7 +206,7 @@ export default {
       form: {
         id: '',
         subjectID: '', // 学科的相关数据
-        catalogID: 0, // 二级目录的数据
+        catalogID: '', // 二级目录的数据
         direction: '', // 方向
         questionType: '1', // 试题类型
         difficulty: '1', // 难度
@@ -237,9 +236,9 @@ export default {
           { required: true, message: '请选择学科', trigger: 'blur' }
         ],
         // 目录的验证规则
-        // catalogID: [
-        //   { required: true, message: '请选择学科', trigger: 'blur' }
-        // ],
+        catalogID: [
+          { required: true, message: '请选择目录', trigger: 'blur' }
+        ],
         // 方向的验证规则
         direction: [
           { required: true, message: '请选择方向', trigger: 'blur' }
@@ -283,30 +282,37 @@ export default {
           code: 'A：',
           title: '',
           img: '',
-          isRight: false
+          isRight: 0
         },
         {
           id: 2,
           code: 'B：',
           title: '',
           img: '',
-          isRight: false
+          isRight: 0
         },
         {
           id: 3,
           code: 'C：',
           title: '',
           img: '',
-          isRight: false
+          isRight: 0
         },
         {
           id: 4,
           code: 'D：',
           title: '',
           img: '',
-          isRight: false
+          isRight: 0
         }
-      ]
+      ],
+      newId: 5,
+      newCode: 69,
+      // 单选的情况
+      optionsNum: '',
+      // 多选的情况
+      optionsArr: []
+
     }
   },
   props: {
@@ -346,10 +352,10 @@ export default {
       try {
         // 获取学科二级目录的请求
         console.log(this.form.subjectID)
-        const { data } = await createAPI(`/directorys/${this.form.subjectID}`, 'get')
+        const { data } = await createAPI('/directorys/', 'get')
         // const { data } = await detail(id)
         console.log(data)
-        this.twoLevelDirectory = data.twoLevelDirectory
+        this.twoLevelDirectory = data.items
 
         // 获取当前试题标签的请求
         const res = await createAPI('/tags/' + this.form.subjectID, 'get')
@@ -426,6 +432,16 @@ export default {
         if (!valid) return this.$message.error('请将必填项填写完成！')
         // 成功之后再发起请求
       try {
+        // 判断单选或者多选的情况
+        if (this.form.questionType === '1') {
+          var newradio = this.optionCheckbox.find(item => {
+            return item.id = this.optionsNum
+          })
+          console.log(newradio)
+
+        }
+        // 把数据存入form.options中
+        this.form.options = this.optionCheckbox
         const { data } = await add(this.form)
         console.log(data)
         this.$message.success('新增题库成功')
@@ -455,14 +471,20 @@ export default {
     },
     // 点击添加选项按钮时添加一个选项
     addOptions () {
+      if (this.newCode > 90) {
+        return this.$message.info('选项不能再多了！')
+      }
       const list = {
-          id: 4,
-          code: 'D：',
+          id: '',
+          code: '',
           title: '',
           img: '',
           isRight: false
-        }
+      }
+      list.code = String.fromCharCode(this.newCode++)
+      list.id = this.newId++
       this.optionCheckbox.push(list)
+
     }
     
   }
@@ -498,6 +520,7 @@ export default {
   position: relative;
   border: 1px dashed #999;
   height: 50px;
+  margin-left: 10px;
   .icon_close {
     position: absolute;
     right: -8px;

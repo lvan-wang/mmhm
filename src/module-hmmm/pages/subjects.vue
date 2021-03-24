@@ -35,6 +35,9 @@
         prop="addDate"
         label="创建日期"
         width="200">
+           <template slot-scope="scope">
+            {{ scope.row.addDate | parseTimeByString }}
+          </template>
       </el-table-column>
       <el-table-column
         prop="isFrontDisplay"
