@@ -73,8 +73,9 @@
         </el-table-column>
       </el-table>
       <!-- 分页 -->
-       <el-pagination
-          style="float: right; margin: 20px"
+       <div class="fenye">
+         <el-pagination
+        style="margin-top:20px;text-align:right"
           background
           @current-change="changePage"
           @size-change="changeSize"
@@ -84,6 +85,7 @@
           layout="prev, pager, next, sizes, jumper"
           :total="total">
         </el-pagination>
+       </div>
     </el-card>
     <directory-add ref="Popup" :oneData="oneData" @addSuccess="succeedOpen"></directory-add>
   </div>
@@ -112,7 +114,7 @@ export default {
         // 学科id，需要根据地址动态获取
         subjectID: this.$route.query.id,
         page: 1,
-        pagesize: 5
+        pagesize: 10
       },
       // 目录数据
       statusList: status,
@@ -211,4 +213,8 @@ export default {
 }
 </script>
 
-<style scoped lang='scss'></style>
+<style scoped lang='scss'>
+.fenye {
+  margin: 20px 0 10px 0;
+  height: 20px;
+}</style>
