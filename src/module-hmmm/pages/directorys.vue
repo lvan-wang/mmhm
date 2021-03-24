@@ -114,7 +114,7 @@ export default {
         // 学科id，需要根据地址动态获取
         subjectID: this.$route.query.id,
         page: 1,
-        pagesize: 5
+        pagesize: 10
       },
       // 目录数据
       statusList: status,

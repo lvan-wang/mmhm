@@ -9,7 +9,7 @@
           <quill-editor v-model="formModel.articleBody" :options="editorOptions"></quill-editor>
         </el-form-item>
         <el-form-item label="视频地址:">
-          <el-input placeholder="请输入视频地址"></el-input>
+          <el-input v-model="formModel.videoURL" placeholder="请输入视频地址"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer">
