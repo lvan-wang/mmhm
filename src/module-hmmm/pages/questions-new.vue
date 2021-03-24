@@ -186,7 +186,7 @@
         <!-- 试题标签 multiple -->
         <el-form-item label="试题标签：" >
           <el-select v-model="form.tags"  placeholder="请选择试题标签"  class="select_content">
-                <el-option v-for="item, index in tagName" :key="index" :label="item.tagName" :value="item.id"></el-option>
+                <el-option v-for="item, index in tagName" :key="index" :label="item.tagName" :value="item.tagName"></el-option>
               </el-select>
         </el-form-item>
 
@@ -464,9 +464,8 @@ export default {
           console.log(newradio)
 
         }
-        console.log(this.form.tags)
         this.form.tags = this.form.tags + ''
-        console.log(this.form.tags)
+
         // 把数据存入form.options中
         this.form.options = this.optionCheckbox
         const { data } = await add(this.form)
