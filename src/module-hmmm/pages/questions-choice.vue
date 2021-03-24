@@ -133,7 +133,11 @@
             <div v-html="scope.row.question"></div>
           </template>
         </el-table-column>
-        <el-table-column label="录入时间" prop="addDate" width="180"></el-table-column>
+        <el-table-column label="录入时间" prop="addDate" width="180">
+          <template slot-scope="scope">
+              <span>{{scope.row.addDate | parseTimeByString }}</span>
+            </template>
+        </el-table-column>
         <el-table-column label="难度" width="100">
           <template slot-scope="scope">
             <div>{{ scope.row.difficulty === '1' ? '简单' : scope.row.difficulty === '2' ? '一般' : '困难'}}</div>
