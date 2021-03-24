@@ -75,6 +75,7 @@
       <!-- 分页 -->
        <div class="fenye">
          <el-pagination
+        style="margin-top:20px;text-align:right"
           background
           @current-change="changePage"
           @size-change="changeSize"

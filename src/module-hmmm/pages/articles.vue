@@ -60,6 +60,7 @@
       <!-- 分页 -->
       <div class="fenye">
         <el-pagination
+        style="margin-top:20px;text-align:right"
         background
         :total="total"
         layout="prev, pager, next,  sizes, jumper"
