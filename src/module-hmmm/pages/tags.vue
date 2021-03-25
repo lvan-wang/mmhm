@@ -102,7 +102,7 @@
       </div>
       <!-- /分页 -->
       <!-- 新增标签弹层 -->
-        <Dialog ref="editTags" :titleInfo="titleInfo" :formBase="formData" v-on:newDataes="loadTagsList"></Dialog>
+        <Dialog ref="editTags" :titleInfo="titleInfo" :formData="formData" v-on:newDataes="loadTagsList" ></Dialog>
       </el-card>
     </div>
   </div>
@@ -136,6 +136,7 @@ export default {
         text: '' // 新增、编辑文本
       },
       formData: {
+        id: '',
         subjectName: '',
         tagName: ''
       }
@@ -244,7 +245,11 @@ export default {
     },
     // 新增、编辑标签
     query () {
-        this.formData = {}
+        this.formData = {
+          id: '',
+          subjectName: '',
+          tagName: ''
+        }
     },
     addEditTags (id) {
       this.query()
@@ -263,7 +268,8 @@ export default {
       // 获取详情 给formData
       this.formData = res
       console.log(this.formData)
-      this.formData.subjectName = res.subjectID
+      // this.formData.subjectName = res.subjectID
+      this.formData.subjectName = res.subjectName
     }
   }
 }

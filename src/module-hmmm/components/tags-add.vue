@@ -13,14 +13,14 @@
           <el-select
             class="filter-item"
             style="width: 130px;"
-            v-model="formBase.subjectName"
+            v-model="formData.subjectName"
             filterable
           >
             <el-option v-for="(item, index) in subjectList" :key="index" :value="item.value" :label="item.label"></el-option>
           </el-select>
           </el-form-item>
       <el-form-item label="标签名称" prop="tagName">
-          <el-input v-model="formBase.tagName"></el-input>
+          <el-input v-model="formData.tagName"></el-input>
       </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -42,7 +42,7 @@ export default {
       type: Object,
       required: true
     },
-    formBase: {
+    formData: {
       type: Object,
       required: true
     }
@@ -56,10 +56,14 @@ export default {
       ruleInline: {
         tagName: [
           { required: true, message: '目录名称不能为空', trigger: 'blur' }
+        ],
+        subjectName: [
+          { required: true, message: '目录名称不能为空', trigger: 'blur' }
         ]
       },
       formBase: {
-        subjectName: ''
+        subjectName: '',
+        tagName: ''
       }
     }
   },
@@ -84,14 +88,14 @@ export default {
       console.log(this.subjectList)
     },
     // 点击确认按钮，执行添加 编辑确认操作
-    async createData () {
+    createData () {
       this.$refs.dataForm.validate(async valid => {
         if (valid) {
           this.dialogFormH()
           const data = {
-            ...this.formBase
+            ...this.formData
           }
-          if (this.formBase.id) {
+          if (this.formData.id) {
             await update(data).then(() => {
               this.$emit('newDataes', this.formBase)
             })
